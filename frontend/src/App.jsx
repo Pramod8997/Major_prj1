@@ -1,199 +1,96 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import { ShoppingBag, Star, Clock, ArrowLeft, Plus, X, Minus } from 'lucide-react'
+import React, { useContext, useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { AuthProvider, AuthContext } from './context/AuthContext';
+import { CartProvider, CartContext } from './context/CartContext';
+import { ShoppingBag, User, LogOut, ClipboardList, Shield } from 'lucide-react';
 
-function App() {
-  const [restaurants, setRestaurants] = useState([])
-  const [selectedRestaurant, setSelectedRestaurant] = useState(null)
-  const [cart, setCart] = useState([])
-  const [isCartOpen, setIsCartOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import RestaurantDetails from './pages/RestaurantDetails';
+import Checkout from './pages/Checkout';
+import OrderHistory from './pages/OrderHistory';
+import AdminDashboard from './pages/AdminDashboard';
+import './index.css';
 
-  useEffect(() => {
-    // Fetch restaurants from backend
-    axios.get('http://localhost:5000/api/restaurants')
-      .then(res => {
-        setRestaurants(res.data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.error('Error fetching restaurants:', err)
-        setLoading(false)
-      })
-  }, [])
+function Navbar() {
+  const { user, logout } = useContext(AuthContext);
+  const { cartItemsCount } = useContext(CartContext);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleRestaurantClick = (id) => {
-    setLoading(true)
-    axios.get(`http://localhost:5000/api/restaurants/${id}`)
-      .then(res => {
-        setSelectedRestaurant(res.data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.error('Error fetching restaurant details:', err)
-        setLoading(false)
-      })
-  }
-
-  const addToCart = (dish) => {
-    setCart(prev => {
-      const existing = prev.find(item => item._id === dish._id)
-      if (existing) {
-        return prev.map(item => item._id === dish._id ? { ...item, qty: item.qty + 1 } : item)
-      }
-      return [...prev, { ...dish, qty: 1 }]
-    })
-  }
-
-  const updateQty = (id, delta) => {
-    setCart(prev => prev.map(item => {
-      if (item._id === id) {
-        const newQty = item.qty + delta
-        return newQty > 0 ? { ...item, qty: newQty } : null
-      }
-      return item
-    }).filter(Boolean))
-  }
-
-  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0)
-  const cartItemsCount = cart.reduce((sum, item) => sum + item.qty, 0)
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <>
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="container navbar-content">
-          <div className="logo" onClick={() => setSelectedRestaurant(null)}>
-            <div style={{ background: 'var(--primary)', color: 'white', borderRadius: '8px', padding: '4px 8px' }}>G</div>
-            Gourmet
-          </div>
-          <button className="cart-btn" onClick={() => setIsCartOpen(true)}>
-            <ShoppingBag size={20} />
-            Cart
-            {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
-          </button>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="container">
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--text-muted)' }}>Loading...</div>
-        ) : selectedRestaurant ? (
-          // Menu View
-          <div className="menu-section">
-            <button className="back-btn" onClick={() => setSelectedRestaurant(null)}>
-              <ArrowLeft size={18} /> Back to Restaurants
-            </button>
-            <div style={{ marginBottom: '32px' }}>
-              <img src={selectedRestaurant.image} alt={selectedRestaurant.name} style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '16px', marginBottom: '24px' }} />
-              <h1>{selectedRestaurant.name}</h1>
-              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>{selectedRestaurant.description}</p>
-            </div>
-            
-            <h2>Menu</h2>
-            <div className="grid">
-              {selectedRestaurant.dishes.map(dish => (
-                <div className="dish-card" key={dish._id}>
-                  <div className="dish-info">
-                    <h3 className="dish-title">{dish.name}</h3>
-                    <p className="dish-desc">{dish.description}</p>
-                    <div className="dish-price">${dish.price.toFixed(2)}</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                    <img src={dish.image} alt={dish.name} className="dish-img" />
-                    <button className="add-btn" onClick={() => addToCart(dish)}>
-                      <Plus size={20} />
-                    </button>
+    <nav className="navbar">
+      <div className="container navbar-content">
+        <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'var(--primary)', color: 'white', borderRadius: '8px', padding: '4px 8px' }}>G</div>
+          Gourmet
+        </Link>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          {user ? (
+            <div style={{ position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <span style={{ fontWeight: '500' }}>Hi, {user.name}</span>
+                <button className="cart-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ padding: '8px' }}>
+                  <User size={20} />
+                </button>
+                <Link to="/checkout" style={{ textDecoration: 'none' }}>
+                  <button className="cart-btn">
+                    <ShoppingBag size={20} />
+                    {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
+                  </button>
+                </Link>
+              </div>
+              {isMenuOpen && (
+                <div style={{ position: 'absolute', top: '100%', right: '0', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 0', marginTop: '8px', width: '200px', boxShadow: 'var(--shadow-md)', zIndex: 100 }}>
+                  {user.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', textDecoration: 'none', color: 'inherit' }}>
+                      <Shield size={16} /> Admin Dashboard
+                    </Link>
+                  )}
+                  <Link to="/orders" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', textDecoration: 'none', color: 'inherit' }}>
+                    <ClipboardList size={16} /> My Orders
+                  </Link>
+                  <div onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', cursor: 'pointer', color: 'var(--primary)' }}>
+                    <LogOut size={16} /> Logout
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          // Restaurant List View
-          <>
-            <section className="hero">
-              <h1>Delicious food, delivered to you</h1>
-              <p>Explore the best restaurants in your area and enjoy a premium dining experience at home.</p>
-            </section>
-            
-            <div className="grid">
-              {restaurants.map(rest => (
-                <div className="restaurant-card" key={rest._id} onClick={() => handleRestaurantClick(rest._id)}>
-                  <img src={rest.image} alt={rest.name} className="restaurant-img" />
-                  <div className="restaurant-info">
-                    <div className="restaurant-header">
-                      <h3 className="restaurant-title">{rest.name}</h3>
-                      <div className="rating">
-                        <Star className="star-icon" />
-                        {rest.rating}
-                      </div>
-                    </div>
-                    <p className="restaurant-desc">{rest.description}</p>
-                    <div className="restaurant-meta">
-                      <div className="meta-item">
-                        <Clock size={16} />
-                        {rest.deliveryTime}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </main>
-
-      {/* Cart Sidebar */}
-      {isCartOpen && (
-        <div className="cart-overlay" onClick={() => setIsCartOpen(false)}>
-          <div className="cart-sidebar" onClick={e => e.stopPropagation()}>
-            <div className="cart-header">
-              <h2>Your Order</h2>
-              <button className="close-btn" onClick={() => setIsCartOpen(false)}>
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="cart-items">
-              {cart.length === 0 ? (
-                <div className="cart-empty">Your cart is empty</div>
-              ) : (
-                cart.map(item => (
-                  <div className="cart-item" key={item._id}>
-                    <div className="cart-item-info">
-                      <div className="cart-item-title">{item.name}</div>
-                      <div className="cart-item-price">${item.price.toFixed(2)}</div>
-                    </div>
-                    <div className="cart-item-actions">
-                      <button className="qty-btn" onClick={() => updateQty(item._id, -1)}>
-                        <Minus size={14} />
-                      </button>
-                      <span>{item.qty}</span>
-                      <button className="qty-btn" onClick={() => updateQty(item._id, 1)}>
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))
               )}
             </div>
-            
-            <div className="cart-footer">
-              <div className="cart-total">
-                <span>Total</span>
-                <span>${cartTotal.toFixed(2)}</span>
-              </div>
-              <button className="checkout-btn" disabled={cart.length === 0}>
-                Checkout
-              </button>
-            </div>
-          </div>
+          ) : (
+            <>
+              <Link to="/login" style={{ textDecoration: 'none' }}><button className="cart-btn" style={{ border: 'none' }}>Login</button></Link>
+              <Link to="/register" style={{ textDecoration: 'none' }}><button className="checkout-btn" style={{ padding: '8px 16px', width: 'auto' }}>Sign Up</button></Link>
+            </>
+          )}
         </div>
-      )}
-    </>
-  )
+      </div>
+    </nav>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/restaurant/:id" element={<RestaurantDetails />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<OrderHistory />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
