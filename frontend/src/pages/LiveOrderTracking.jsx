@@ -1,12 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { CheckCircle, Clock, MapPin, Package, ChefHat, Truck } from 'lucide-react';
+import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
+import toast from 'react-hot-toast';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+  borderRadius: '16px'
+};
+
+// Dummy coordinates for simulation
+const restaurantLocation = { lat: 40.7128, lng: -74.0060 }; // NYC
+const userLocation = { lat: 40.730610, lng: -73.935242 };
 
 export default function LiveOrderTracking() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Load Google Maps script
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "" // Fallback will show dev watermark
+  });
 
   const fetchOrder = async () => {
     try {
@@ -15,6 +33,11 @@ export default function LiveOrderTracking() {
         headers: { 'x-auth-token': token }
       });
       const currentOrder = res.data.find(o => o._id === id);
+      
+      if (order && currentOrder && order.status !== currentOrder.status) {
+        toast.success(`Status Update: ${currentOrder.status.replace('_', ' ').toUpperCase()}`, { icon: '🔔' });
+      }
+      
       setOrder(currentOrder);
       setLoading(false);
     } catch (err) {
@@ -27,7 +50,7 @@ export default function LiveOrderTracking() {
     fetchOrder();
     const interval = setInterval(fetchOrder, 5000);
     return () => clearInterval(interval);
-  }, [id]);
+  }, [id, order]);
 
   if (loading) return <div className="text-center py-32"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500 mx-auto"></div></div>;
   if (!order) return <div className="text-center py-32 text-xl text-gray-500">Order not found</div>;
@@ -44,7 +67,7 @@ export default function LiveOrderTracking() {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="bg-brand-500 text-white p-8 text-center relative overflow-hidden">
            <div className="relative z-10">
@@ -53,7 +76,7 @@ export default function LiveOrderTracking() {
            </div>
         </div>
         
-        <div className="p-8">
+        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="mb-12 relative">
             <div className="absolute left-[23px] top-4 bottom-4 w-[2px] bg-gray-100"></div>
             
@@ -79,16 +102,33 @@ export default function LiveOrderTracking() {
             </div>
           </div>
 
-          <div className="bg-gray-100 rounded-2xl h-48 flex items-center justify-center mb-8 relative overflow-hidden group border border-gray-200">
-            <div className="absolute inset-0 opacity-40 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=New+York,NY&zoom=13&size=800x400&maptype=roadmap&sensor=false')] bg-cover bg-center"></div>
-            <div className="relative z-10 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-bold text-gray-700 shadow-sm flex items-center gap-2 group-hover:scale-105 transition cursor-pointer border border-gray-100">
-              <MapPin className="text-brand-500" size={16} /> Map loading text fallback...
-            </div>
+          <div className="h-full min-h-[400px]">
+            {isLoaded ? (
+              <div className="w-full h-full rounded-2xl overflow-hidden border border-gray-200 shadow-sm relative">
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={restaurantLocation}
+                  zoom={12}
+                  options={{ disableDefaultUI: true }}
+                >
+                  <Marker position={restaurantLocation} label="R" />
+                  <Marker position={userLocation} label="U" />
+                  <Polyline 
+                    path={[restaurantLocation, userLocation]}
+                    options={{ strokeColor: '#f43f5e', strokeOpacity: 0.8, strokeWeight: 4 }}
+                  />
+                </GoogleMap>
+              </div>
+            ) : (
+              <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200">
+                <p className="text-gray-500 font-medium">Loading Map...</p>
+              </div>
+            )}
           </div>
+        </div>
 
-          <div className="border-t pt-6 flex justify-between items-center">
+        <div className="px-8 pb-8 border-t pt-6 flex justify-between items-center">
              <Link to="/orders" className="text-brand-500 font-semibold hover:text-brand-600">View all orders →</Link>
-          </div>
         </div>
       </div>
     </div>

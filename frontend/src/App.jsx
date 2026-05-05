@@ -12,6 +12,8 @@ import Checkout from './pages/Checkout';
 import OrderHistory from './pages/OrderHistory';
 import AdminDashboard from './pages/AdminDashboard';
 import LiveOrderTracking from './pages/LiveOrderTracking';
+import ActiveOrderMenu from './components/ActiveOrderMenu';
+import { Toaster } from 'react-hot-toast';
 import './index.css';
 
 function Navbar() {
@@ -37,6 +39,7 @@ function Navbar() {
             <div style={{ position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <span style={{ fontWeight: '500' }}>Hi, {user.name}</span>
+                <ActiveOrderMenu />
                 <button className="cart-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ padding: '8px' }}>
                   <User size={20} />
                 </button>
@@ -80,6 +83,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
+          <Toaster position="top-center" toastOptions={{ duration: 4000, style: { borderRadius: '16px', background: '#333', color: '#fff' } }} />
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />

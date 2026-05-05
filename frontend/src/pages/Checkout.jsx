@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { CreditCard, CheckCircle, MapPin, Truck } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Checkout() {
   const { user } = useContext(AuthContext);
@@ -64,11 +65,12 @@ export default function Checkout() {
       });
       
       clearCart();
+      toast.success('Order placed successfully! Preparing your food.', { icon: '🍔' });
       setTimeout(() => {
         navigate(`/track/${res.data._id}`);
       }, 1500); // simulate payment delay
     } catch (err) {
-      alert('Failed to place order. Please try again.');
+      toast.error('Failed to place order. Please try again.');
       setLoading(false);
       setPaymentStep(false);
     }

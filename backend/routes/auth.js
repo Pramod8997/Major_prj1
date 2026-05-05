@@ -9,7 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretfooddeliverykey';
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name, adminCode } = req.body;
+    let { email, password, name, adminCode } = req.body;
+    email = email.toLowerCase().trim();
     
     // Check if user exists
     let user = await User.findOne({ email });
@@ -27,7 +28,7 @@ router.post('/register', async (req, res) => {
     user = new User({ email, password: hashedPassword, name, role });
     await user.save();
 
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id, role: user.role, name: user.name, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error(err.message);
@@ -38,7 +39,8 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    email = email.toLowerCase().trim();
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -50,7 +52,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id, role: user.role, name: user.name, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     console.error(err.message);

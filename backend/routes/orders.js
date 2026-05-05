@@ -34,6 +34,20 @@ router.get('/history', authMiddleware, async (req, res) => {
   }
 });
 
+// Get user's active orders
+router.get('/active', authMiddleware, async (req, res) => {
+  try {
+    const orders = await Order.find({ 
+      user: req.user.id, 
+      status: { $nin: ['delivered', 'cancelled'] } 
+    }).sort({ createdAt: -1 }).populate('restaurant', 'name');
+    res.json(orders);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 // Update order status (Admin/Restaurant)
 router.put('/:id/status', authMiddleware, async (req, res) => {
   try {
