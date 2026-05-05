@@ -14,6 +14,31 @@ router.get('/restaurants', async (req, res) => {
   }
 });
 
+// Advanced search for restaurants and dishes
+router.get('/search', async (req, res) => {
+  try {
+    const { q, type } = req.query; // type: 'restaurant' or 'dish' or 'all'
+    let results = { restaurants: [], dishes: [] };
+    
+    if (!q) return res.json(results);
+    const regex = new RegExp(q, 'i');
+    
+    if (type === 'restaurant' || !type || type === 'all') {
+      results.restaurants = await Restaurant.find({ 
+        $or: [{ name: regex }, { cuisineTypes: regex }] 
+      });
+    }
+    
+    if (type === 'dish' || !type || type === 'all') {
+      results.dishes = await Dish.find({ name: regex });
+    }
+    
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Get a single restaurant with its dishes
 router.get('/restaurants/:id', async (req, res) => {
   try {

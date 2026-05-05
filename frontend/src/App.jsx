@@ -11,6 +11,7 @@ import RestaurantDetails from './pages/RestaurantDetails';
 import Checkout from './pages/Checkout';
 import OrderHistory from './pages/OrderHistory';
 import AdminDashboard from './pages/AdminDashboard';
+import LiveOrderTracking from './pages/LiveOrderTracking';
 import './index.css';
 
 function Navbar() {
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="/restaurant/:id" element={<RestaurantDetails />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/orders" element={<OrderHistory />} />
+            <Route path="/track/:id" element={<LiveOrderTracking />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </CartProvider>

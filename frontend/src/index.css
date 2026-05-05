@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* Color Palette - Premium Warm/Appetizing */
   --primary: #FF5A5F;

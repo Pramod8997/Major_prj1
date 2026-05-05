@@ -32,7 +32,7 @@ const seedDB = async () => {
       description: `A delicious ${category.toLowerCase()} item crafted with the finest ingredients.`,
       price: Number((Math.random() * 20 + 5).toFixed(2)),
       category: category,
-      image: `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600` // generic food image
+      image: `https://loremflickr.com/600/400/food,dish?lock=${i + 1}` // unique food image
     });
   }
   
@@ -62,7 +62,7 @@ const seedDB = async () => {
     restaurantsData.push({
       name: restaurantNames[i],
       description: `Experience the finest dining at ${restaurantNames[i]} with our exquisite collection of dishes.`,
-      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800',
+      image: `https://loremflickr.com/800/600/restaurant,exterior?lock=${i + 1}`,
       rating: Number((Math.random() * 2 + 3).toFixed(1)), // 3.0 to 5.0
       deliveryTime: `${Math.floor(Math.random() * 20) + 20}-${Math.floor(Math.random() * 20) + 40} min`,
       dishes: assignedDishes

@@ -26,6 +26,7 @@ require('dotenv').config();
 const apiRoutes = require('./routes/api');
 const { router: authRoutes } = require('./routes/auth');
 const ordersRoutes = require('./routes/orders');
+const reviewsRoutes = require('./routes/reviews');
 const seedDB = require('./seed');
 
 const app = express();
@@ -41,6 +42,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'OK' }));
 app.use('/api', apiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/reviews', reviewsRoutes);
 
 const startServer = async () => {
   try {

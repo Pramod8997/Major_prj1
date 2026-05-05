@@ -12,7 +12,14 @@ const orderSchema = new mongoose.Schema({
     }
   ],
   totalAmount: { type: Number, required: true },
-  status: { type: String, enum: ['pending', 'preparing', 'out_for_delivery', 'delivered'], default: 'pending' },
+  deliveryFee: { type: Number, default: 0 },
+  tax: { type: Number, default: 0 },
+  deliveryAddress: {
+    street: String,
+    city: String,
+    zip: String
+  },
+  status: { type: String, enum: ['pending', 'accepted', 'cooking', 'out_for_delivery', 'delivered', 'cancelled'], default: 'pending' },
   createdAt: { type: Date, default: Date.now }
 });
 
