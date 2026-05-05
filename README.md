@@ -35,6 +35,31 @@ Gourmet is a modern, full-stack food delivery application inspired by industry l
 
 ---
 
+## 📁 Project Structure
+
+```text
+Major_prj1/
+├── backend/
+│   ├── middleware/      # JWT and Auth middleware logic
+│   ├── models/          # Mongoose DB schemas (User, Restaurant, Order, Review)
+│   ├── routes/          # Express API endpoints
+│   ├── seed.js          # Database populator script
+│   └── server.js        # Backend entry point
+├── frontend/
+│   ├── src/
+│   │   ├── components/  # Reusable UI elements (SearchBar, Sidebar, etc.)
+│   │   ├── context/     # Global state (AuthContext, CartContext)
+│   │   ├── pages/       # Route-level components (Home, Checkout, Tracking)
+│   │   ├── App.jsx      # Main application router and layout
+│   │   └── index.css    # Global Tailwind styles
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   └── package.json
+└── README.md
+```
+
+---
+
 ## 📸 Screenshots
 
 *(Note: Create a `docs/screenshots` folder in the root directory and add your screenshots with the corresponding names below to display them!)*
