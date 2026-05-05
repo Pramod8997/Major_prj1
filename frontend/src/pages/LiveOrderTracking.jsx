@@ -20,10 +20,12 @@ export default function LiveOrderTracking() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load Google Maps script
-  const { isLoaded } = useJsApiLoader({
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+  // Load Google Maps script only if we have a key
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "" // Fallback will show dev watermark
+    googleMapsApiKey: apiKey || "dummy", 
   });
 
   const fetchOrder = async () => {
@@ -103,7 +105,7 @@ export default function LiveOrderTracking() {
           </div>
 
           <div className="h-full min-h-[400px]">
-            {isLoaded ? (
+            {apiKey && isLoaded && !loadError ? (
               <div className="w-full h-full rounded-2xl overflow-hidden border border-gray-200 shadow-sm relative">
                 <GoogleMap
                   mapContainerStyle={mapContainerStyle}
@@ -120,8 +122,16 @@ export default function LiveOrderTracking() {
                 </GoogleMap>
               </div>
             ) : (
-              <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200">
-                <p className="text-gray-500 font-medium">Loading Map...</p>
+              <div className="w-full h-full bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 shadow-sm relative">
+                 <iframe 
+                   title="Google Map Fallback"
+                   width="100%" 
+                   height="100%" 
+                   frameBorder="0" 
+                   style={{ border: 0 }}
+                   src={`https://maps.google.com/maps?q=${restaurantLocation.lat},${restaurantLocation.lng}&z=13&output=embed`}
+                   allowFullScreen
+                 ></iframe>
               </div>
             )}
           </div>

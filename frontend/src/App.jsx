@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { CartProvider, CartContext } from './context/CartContext';
-import { ShoppingBag, User, LogOut, ClipboardList, Shield } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -13,58 +13,35 @@ import OrderHistory from './pages/OrderHistory';
 import AdminDashboard from './pages/AdminDashboard';
 import LiveOrderTracking from './pages/LiveOrderTracking';
 import ActiveOrderMenu from './components/ActiveOrderMenu';
+import Sidebar from './components/Sidebar';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
 
 function Navbar() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const { cartItemsCount } = useContext(CartContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
-    <nav className="navbar">
-      <div className="container navbar-content">
-        <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
-          <div style={{ background: 'var(--primary)', color: 'white', borderRadius: '8px', padding: '4px 8px' }}>G</div>
-          Gourmet
-        </Link>
+    <nav className="h-16 border-b border-gray-100 sticky top-0 z-10 bg-white/80 backdrop-blur-md flex items-center shrink-0">
+      <div className="w-full px-6 flex justify-between items-center">
+        {!user ? (
+          <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
+            <div style={{ background: 'var(--primary)', color: 'white', borderRadius: '8px', padding: '4px 8px' }}>G</div>
+            Gourmet
+          </Link>
+        ) : (
+          <div className="font-bold text-gray-800 text-lg">Gourmet</div>
+        )}
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           {user ? (
-            <div style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ fontWeight: '500' }}>Hi, {user.name}</span>
-                <ActiveOrderMenu />
-                <button className="cart-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ padding: '8px' }}>
-                  <User size={20} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <ActiveOrderMenu />
+              <Link to="/checkout" style={{ textDecoration: 'none' }}>
+                <button className="cart-btn bg-white hover:bg-gray-50 border border-gray-200">
+                  <ShoppingBag size={20} className="text-gray-700" />
+                  {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
                 </button>
-                <Link to="/checkout" style={{ textDecoration: 'none' }}>
-                  <button className="cart-btn">
-                    <ShoppingBag size={20} />
-                    {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
-                  </button>
-                </Link>
-              </div>
-              {isMenuOpen && (
-                <div style={{ position: 'absolute', top: '100%', right: '0', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px 0', marginTop: '8px', width: '200px', boxShadow: 'var(--shadow-md)', zIndex: 100 }}>
-                  {user.role === 'admin' && (
-                    <Link to="/admin" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', textDecoration: 'none', color: 'inherit' }}>
-                      <Shield size={16} /> Admin Dashboard
-                    </Link>
-                  )}
-                  <Link to="/orders" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', textDecoration: 'none', color: 'inherit' }}>
-                    <ClipboardList size={16} /> My Orders
-                  </Link>
-                  <div onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', cursor: 'pointer', color: 'var(--primary)' }}>
-                    <LogOut size={16} /> Logout
-                  </div>
-                </div>
-              )}
+              </Link>
             </div>
           ) : (
             <>
@@ -78,13 +55,14 @@ function Navbar() {
   );
 }
 
-export default function App() {
+function MainLayout() {
+  const { user } = useContext(AuthContext);
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Toaster position="top-center" toastOptions={{ duration: 4000, style: { borderRadius: '16px', background: '#333', color: '#fff' } }} />
-          <Navbar />
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50/50">
+      {user && <Sidebar />}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+        <Navbar />
+        <main className="flex-1 overflow-y-auto w-full relative p-4 lg:p-8">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -95,6 +73,19 @@ export default function App() {
             <Route path="/track/:id" element={<LiveOrderTracking />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <Toaster position="top-center" toastOptions={{ duration: 4000, style: { borderRadius: '16px', background: '#333', color: '#fff' } }} />
+          <MainLayout />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
