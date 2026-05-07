@@ -1,10 +1,8 @@
-# Gourmet - Premium Food Delivery Platform 🍔🍕
-
-![Gourmet Hero Banner](./docs/screenshots/hero-banner.png)
+# Gourmet - Premium Food Delivery Platform 
 
 Gourmet is a modern, full-stack food delivery application inspired by industry leaders like Swiggy and Zomato. Built with a focus on premium aesthetics and real-time functionality, it offers a seamless experience from browsing restaurants to live tracking your food delivery.
 
-## ✨ Key Features
+## Key Features
 
 ### For Users
 * **Advanced Search**: Instantly find your favorite dishes or restaurants with real-time fuzzy search.
@@ -18,7 +16,7 @@ Gourmet is a modern, full-stack food delivery application inspired by industry l
 * **Live Order Management**: View all incoming orders platform-wide and dynamically update their statuses.
 * **Restaurant Management**: Add new restaurants, manage cuisine types, delivery times, and delete outdated listings.
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 **Frontend**
 * [React 18](https://reactjs.org/) + [Vite](https://vitejs.dev/)
@@ -35,7 +33,7 @@ Gourmet is a modern, full-stack food delivery application inspired by industry l
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 Major_prj1/
@@ -60,29 +58,29 @@ Major_prj1/
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 *(Note: Create a `docs/screenshots` folder in the root directory and add your screenshots with the corresponding names below to display them!)*
 
 ### 1. Dashboard Layout & Home Page
-![Home Page](./docs/screenshots/home.png)
+
 *A sleek dashboard layout featuring a left sidebar for navigation and a responsive grid of restaurant cards.*
 
 ### 2. Live Order Tracking (Google Maps)
-![Live Tracking](./docs/screenshots/tracking.png)
+
 *Real-time order progress timeline alongside an interactive Google Maps iframe.*
 
 ### 3. Virtual Checkout & Payment
-![Checkout](./docs/screenshots/checkout.png)
+
 *Simulated local payment gateway for a seamless checkout experience.*
 
 ### 4. Admin Order Management
-![Admin Dashboard](./docs/screenshots/admin.png)
+
 *Tabbed admin interface for managing live orders and platform restaurants.*
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -120,7 +118,7 @@ To enable the interactive Google Maps routing (instead of the fallback iframe), 
 VITE_GOOGLE_MAPS_API_KEY=your_actual_google_maps_api_key_here
 ```
 
-## 🔐 Default Test Accounts
+##  Default Test Accounts
 If using the persistent database, you can log in with:
 * **Admin**: Register a new user and enter `ADMIN123` in the optional "Admin Code" field to gain dashboard access.
 
